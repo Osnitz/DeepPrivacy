@@ -21,6 +21,14 @@ def batched_iterator(batch, batch_size):
             for key, arr in batch.items()
         }
 
+def get_n_params(model):
+    pp=0
+    for p in list(model.parameters()):
+        nn=1
+        for s in list(p.size()):
+            nn = nn*s
+        pp += nn
+    return pp
 
 class DeepPrivacyAnonymizer(Anonymizer):
 
@@ -32,6 +40,7 @@ class DeepPrivacyAnonymizer(Anonymizer):
         self.batch_size = batch_size
         self.pose_size = self.cfg.models.pose_size
         self.generator = generator
+        #print("DeepPrivacy params: ", get_n_params(self.generator))
         self.truncation_level = truncation_level
         self.save_debug = save_debug
         self.fp16_inference = fp16_inference

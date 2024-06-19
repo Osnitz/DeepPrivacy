@@ -31,7 +31,7 @@ def get_target_paths(source_paths: typing.List[pathlib.Path],
             f"Target path is 1 file, but expected several inputs" + \
             f"target path={target_path}, source_path={source_paths}"
         target_path.parent.mkdir(exist_ok=True)
-        return [target_path]
+        return [target_path / p.name for p in source_paths]
     logger.info(
         f"Found no target path. Setting to default output path: {default_dir}")
     default_target_dir = default_dir
