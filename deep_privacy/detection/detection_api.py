@@ -141,7 +141,7 @@ class ImageAnnotation:
         return self.keypoints.shape[0]
 
     def get_mask(self, idx):
-        mask = np.ones(self.im.shape[:2], dtype=np.bool)
+        mask = np.ones(self.im.shape[:2], dtype=np.bool_)
         x0, y0, x1, y1 = self.bbox_XYXY[idx]
         mask[y0:y1, x0:x1] = 0
         return mask
@@ -154,7 +154,7 @@ class ImageAnnotation:
         resize_factor = imsize / (box_exp[2] - box_exp[0])
         boxes *= resize_factor
         boxes = boxes.astype(int)
-        mask = np.ones((imsize, imsize), dtype=np.bool)
+        mask = np.ones((imsize, imsize), dtype=np.bool_)
         x0, y0, x1, y1 = boxes
         mask[y0:y1, x0:x1] = 0
         return mask

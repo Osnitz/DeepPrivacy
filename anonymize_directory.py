@@ -16,8 +16,8 @@ if __name__ == '__main__':
     # AffectNet (val)
     #dataset_path = '../../datasets/AffectNet_aligned'
     #dataset_save = '../../datasets/AffectNet_DeepPrivacy_deidentified'
-    dataset_path = '/home/blaz/Downloads/AffectNet_Sample_uncropped/val_class_aligned'      
-    dataset_save = '../../datasets/AffectNet2_DeepPrivacy_deidentified/'
+    dataset_path = '/home/matthieup/deid-toolkit/root_dir/datasets/aligned/fri'      
+    dataset_save = '/home/matthieup/deid_techniques_and_evaluation/techniques/DeepPrivacy/Test_results'
 
     dataset_filetype = 'jpg'
     dataset_newtype = 'jpg'

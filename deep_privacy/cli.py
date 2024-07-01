@@ -2,9 +2,15 @@ import pathlib
 import os
 import typing
 import argparse
+import numpy as np
+import torch
 from deep_privacy import logger
 from deep_privacy.inference.deep_privacy_anonymizer import DeepPrivacyAnonymizer
 from deep_privacy.build import build_anonymizer, available_models
+from face_detection.retinaface.detect import RetinaNetDetector
+from face_detection import base, torch_utils
+from face_detection.retinaface.config import cfg_mnet,cfg_re50
+from face_detection.retinaface.models.retinaface import RetinaFace
 video_suffix = [".mp4"]
 image_suffix = [".jpg", ".jpeg", ".png"]
 
@@ -136,6 +142,46 @@ def main():
     if len(image_paths) > 0:
         anonymizer.anonymize_image_paths(image_paths, image_target_paths)
 
+class face_detection(base.Detector):
+    def __init__(self, model: str, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        model_dir = "/home/matthieup/.cache/torch/hub/checkpoints/"
+        map_location = torch_utils.get_device()
+
+        if model == "mobilenet":
+            cfg = cfg_mnet
+            state_dict = self.load_local_or_remote_state_dict(
+                "RetinaFace_mobilenet025.pth",
+                model_dir=model_dir,
+                map_location=map_location
+            )
+        else:
+            assert model == "resnet50"
+            cfg = cfg_re50
+            state_dict = self.load_local_or_remote_state_dict(
+                "RetinaFace_ResNet50.pth",
+                model_dir=model_dir,
+                map_location=map_location
+            )
+            state_dict = {k.replace("module.", ""): v for k, v in state_dict.items()}
+
+        net = RetinaFace(cfg=cfg)
+        net.eval()
+        net.load_state_dict(state_dict)
+        self.cfg = cfg
+        self.net = net.to(self.device)
+        self.mean = np.array([104, 117, 123], dtype=np.float32)
+        self.prior_box_cache = {}
+
+    def load_local_or_remote_state_dict(self, filename, model_dir, map_location):
+        local_path = os.path.join(model_dir, filename)
+        if os.path.exists(local_path):
+            state_dict = torch.load(local_path, map_location=map_location)
+        else:
+            raise FileNotFoundError(f"The model file {filename} does not exist in {model_dir}")
+        return state_dict
+
 
 if __name__ == "__main__":
+    RetinaNetDetector.__init__= face_detection.__init__
     main()
